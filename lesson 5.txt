@@ -1,0 +1,49 @@
+/*Пусть в таблице users поля created_at и updated_at оказались незаполненными. Заполните их текущими датой и временем.*/
+
+CREATE TABLE us (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100) NOT NULL UNIQUE,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT "Время создания строки",  
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT "Время обновления строки"  
+) COMMENT "Статусы сообщений";
+
+TRUNCATE TABLE us;
+INSERT INTO `us` (`id`, `name`, `created_at`, `updated_at`) VALUES (1, 'Тюлькевич', current_timestamp(), current_timestamp());
+COMMIT;
+
+SELECT * FROM us;
+
+/*Таблица users была неудачно спроектирована. Записи created_at и updated_at были заданы типом VARCHAR 
+и в них долгое время помещались значения в формате 20.10.2017 8:10. Необходимо преобразовать поля к типу 
+DATETIME, сохранив введённые ранее значения.*/
+
+SELECT created_at(NOW());
+SELECT updated_at(NOW());
+
+/*В таблице складских запасов storehouses_products в поле value могут встречаться самые разные цифры: 0, 
+если товар закончился и выше нуля, если на складе имеются запасы. Необходимо отсортировать записи таким образом, 
+чтобы они выводились в порядке увеличения значения value. Однако нулевые запасы должны выводиться в конце, 
+после всех записей*/
+
+SELECT * FROM storehouses_products ORDER by `value`;
+
+/*Из таблицы users необходимо извлечь пользователей, родившихся в августе и мае. 
+Месяцы заданы в виде списка английских названий (may, august)*/
+
+SELECT * FROM users where birthday_at = may and birthday_at = august;
+
+/*Подсчитайте средний возраст пользователей в таблице users./*
+
+SELECT id , CONCAT (name , ` ` ,
+TIMESTAMPDIFF(YEAR,birthday_at, NOW()))
+AS name FROM users;
+
+SELECT AVG(birthday_at) FROM users;
+
+/*Подсчитайте количество дней рождения, которые приходятся на каждый из дней недели. 
+Следует учесть, что необходимы дни недели текущего года, а не года рождения./*
+
+
+/*(по желанию) Подсчитайте произведение чисел в столбце таблицы./*
+
+
