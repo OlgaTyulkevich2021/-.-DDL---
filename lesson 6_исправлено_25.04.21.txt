@@ -1,0 +1,38 @@
+﻿/*Пусть задан некоторый пользователь. 
+Из всех друзей этого пользователя найдите человека, который больше всех общался с нашим пользователем.*/
+
+SELECT user_id, friend_id 
+FROM friendship WHERE user_id = 5;
+
+
+/*Подсчитать общее количество лайков, которые получили 10 самых молодых пользователей.*/
+
+SELECT COUNT(id)
+FROM users_likes WHERE user_id IN (
+SELECT * FROM (
+SELECT user_id FROM 'profiles' ORDER by birthday 
+DESC LIMIT 10 )
+AS likes 
+);
+
+
+/*Определить кто больше поставил лайков (всего) - мужчины или женщины?*/
+
+SELECT IF(
+(SELECT COUNT(id) FROM users_likes WHERE user_id IN (
+SELECT user_id FROM 'profiles' WHERE gender='M')
+)
+>
+(SELECT COUNT(id) FROM users_likes WHERE user_id IN (
+SELECT user_id FROM 'profiles' WHERE gender='F')
+),
+'male', 'female');
+
+
+
+
+/*Найти 10 пользователей, которые проявляют наименьшую активность в использовании социальной сети.*/
+
+SELECT id
+FROM users_likes 
+DESC LIMIT 10;
