@@ -1,0 +1,35 @@
+/*1.Проанализировать какие запросы могут выполняться наиболее
+-- часто в процессе работы приложения и добавить необходимые индексы.*/
+
+SELECT posts_like.*
+FROM users;
+CREATE INDEX inx_from_to_posts_like ON users (from_user_id, to_user_id);
+
+/*2. Задание на оконные функции
+-- Построить запрос, который будет выводить следующие столбцы:
+-- имя группы +
+-- среднее количество пользователей в группах +
+-- самый молодой пользователь в группе +
+-- самый старший пользователь в группе +
+-- общее количество пользователей в группе +
+-- всего пользователей в системе+
+-- отношение в процентах (общее количество пользователей в группе / всего пользователей в системе) * 100  */
+
+SELECT communities.id, communities.name,communities_users.user_id
+  ROW_NUMBER() OVER w AS 'row_number',
+  AVG(user_id) OVER w AS average,
+  (SELECT user_id FROM 'profiles' WHERE birthday = MAX) OVER w AS youngest,
+  (SELECT user_id FROM 'profiles' WHERE birthday = MIN)OVER w AS oldest,
+   SUM(user_id) OVER w AS total_user,    
+   SUM(user_id) OVER() AS total_user,
+   SUM(user_id) OVER w / SUM(user_id) OVER() * 100 AS "%%"
+    	
+	FROM (communities
+	JOIN communities_users ON (
+	      communities.id = communities_users.user_id)
+      WINDOW w AS (PARTITION BY communities.id);
+
+
+
+
+
