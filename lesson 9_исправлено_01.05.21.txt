@@ -1,22 +1,25 @@
 “Транзакции, переменные, представления”
-
 /*В базе данных shop и sample присутствуют одни и те же таблицы, учебной базы данных. 
 Переместите запись id = 1 из таблицы shop.users в таблицу sample.users. Используйте транзакции.*/
 
 START TRANSACTION;
 
-UPDATE shop.users
-SET shop.users.id = 1 
-
+INSERT INTO sample.users SELECT * FROM shop.users WHERE id = 1;
+DELETE FROM shop.users WHERE id = 1;
 COMMIT;
 
 /*Создайте представление, которое выводит название name товарной позиции из таблицы products и 
 соответствующее название каталога name из таблицы catalogs./*
 
-CREATE VIEW cat AS SELECT name FROM products
-JOIN catalogs ON products.name = catalogs.name;
-
-
+CREATE OR REPLACE VIEW products_catalogs AS
+SELECT
+p.name AS product,
+c.name AS catalogs
+FROM products AS p
+INNER JOIN
+catalogs AS c 
+ON 
+p.catalog_id = c.id;
 
 
 “Хранимые процедуры и функции, триггеры"
@@ -24,8 +27,24 @@ JOIN catalogs ON products.name = catalogs.name;
 С 6:00 до 12:00 функция должна возвращать фразу "Доброе утро", с 12:00 до 18:00 функция должна возвращать фразу "Добрый день", 
 с 18:00 до 00:00 — "Добрый вечер", с 00:00 до 6:00 — "Доброй ночи"./*
 
--
+CREATE FUNCTION hello ()
+RETURNS TINYTEXT NO SQL --указываем тип возвращаемого значения
+BEGIN
+DECLARE hour INT; ---объявляем переменную
+SET hour = HOUR(NOW()); --наполняем переменную текущим временем
+CASE --в зависимости от значения выводим результат
+WNEN hour BETWEEN 0 AND 5 THEN
+RETURN "Доброй ночи";
+WNEN hour BETWEEN 6 AND 11 THEN
+RETURN "Доброу утро";
+WNEN hour BETWEEN 12 AND 17 THEN
+RETURN "Добрый день";
+WNEN hour BETWEEN 18 AND 23 THEN
+RETURN "Добрый вечер";
+END CASE;
 
+DECLIMER ;
+SELECT NOW(), hello ();
 
 
 /*В таблице products есть два текстовых поля: name с названием товара и description с его описанием. 
@@ -33,5 +52,9 @@ JOIN catalogs ON products.name = catalogs.name;
 Используя триггеры, добейтесь того, чтобы одно из этих полей или оба поля были заполнены. 
 При попытке присвоить полям NULL-значение необходимо отменить операцию./*
 
-
--
+CREATE TRIGGER validate_name_description_insert BEFORE INSERT ON products  --создаём триггер,который срабатывает на insert
+FOR EACH ROW BEGIN --для каждой строки
+IF NEW.name IS NULL AND NEW.description IS NULL THEN ---по идентификатору new проверяем два атрибута; если вставка не соответствует критериям,описанным в условии, выходит ошибка
+SIGNAL SQLSTATE '45000'
+SET MESSAGE_TEXT = 'Both name and description are NULL';
+END IF;
