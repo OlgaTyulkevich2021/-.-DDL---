@@ -1,0 +1,50 @@
+/*1. Создайте таблицу logs типа Archive. Пусть при каждом создании записи в таблицах users, catalogs и products в таблицу logs 
+помещается время и дата создания записи, название таблицы, идентификатор первичного ключа и содержимое поля name.*/
+
+CREATE TABLE Logs (
+	id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMERY KEY,
+	created_at datetime DEFAULT CURRENT_TIMESTAMP,
+	"table_name" varchar(50) NOT NULL,
+	row_id INT UNSIGNED NOT NULL,
+	row_name varchar(255)
+) ENGINE = Archive;
+
+CREATE TRIGGER products_insert ALTER INSERT ON products
+FOR EACH ROW
+BEGIN
+INSERT INTO Logs VALUES (NULL, DEFAULT, "products", NEW.id, NEW.name);
+END;
+
+CREATE TRIGGER products_insert ALTER INSERT ON users
+FOR EACH ROW
+BEGIN
+INSERT INTO Logs VALUES (NULL, DEFAULT, "users", NEW.id, NEW.name);
+END;
+
+CREATE TRIGGER products_insert ALTER INSERT ON catalogs
+FOR EACH ROW
+BEGIN
+INSERT INTO Logs VALUES (NULL, DEFAULT, "catalogs", NEW.id, NEW.name);
+END;
+
+
+/*2.В базе данных Redis подберите коллекцию для подсчета посещений с определенных IP-адресов.*/
+
+HGETALL addresses
+
+/*3.При помощи базы данных Redis решите задачу поиска имени пользователя по электронному адресу и наоборот, 
+поиск электронного адреса пользователя по его имени.*/
+
+HSET emails 'igor' 'irof@gmail.com' --создать, первое поле всегда ключевое!!!
+HSET users 'olga@gmail.com' 'olga' --создать
+
+HGET emails 'igor' --найти email
+HGET users 'olga@gmail.com' --найти пользователя
+
+
+/*4.Организуйте хранение категорий и товарных позиций учебной базы данных shop в СУБД MongoDB.*/
+
+mongo
+use shop
+db.products.find()
+db.catalogs.find()
