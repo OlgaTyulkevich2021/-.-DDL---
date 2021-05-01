@@ -1,0 +1,82 @@
+/*Пусть задан некоторый пользователь. 
+Из всех друзей этого пользователя найдите человека, который больше всех общался с нашим пользователем.*/
+
+SELECT user_id, MAX(messages)
+FROM (
+  SELECT u.id as user_id, f.friend_id, COUNT(m.id)as messages 
+  FROM users u
+  INNER JOIN friendship f ON(
+	u.user_id = f.user_id
+   )
+    LEFT JOIN messages m ON (
+     u.id = to_user_id
+     AND f.friend_id = from_user_id
+   )
+   WHERE u.id=55
+    GROUP BY u.id, f.friend_id
+	)t1
+	GROUP BY user_id;
+
+
+/*Подсчитать общее количество лайков, которые получили 10 самых молодых пользователей.*/
+
+SELECT *
+FROM profiles
+ORDER BY birthday 
+DESC
+LIMIT 10;
+
+SELECT u.id, COUNT(1)
+	FROM (SELECT user_id
+	FROM profiles
+	ORDER BY birthday 
+	DESC
+     LIMIT 10) youngest
+--- у пользоватпеля всегда есть профиль
+     INNER JOIN users u ON (
+      u_id = youngest.user_id
+	  )
+--- у пользователя не обязательно есть пост
+	  LEFT JOIN user_posts up ON (
+	  u_id = up.user_id
+	  )
+--- у поста не обязательно есть лайк
+    LEFT JOIN posts_likes pl ON (
+	  up_id = pl.post_id
+	  )
+	  GROUP BY u.id
+	  ;
+
+
+/*Определить кто больше поставил лайков (всего) - мужчины или женщины?*/
+
+
+SELECT p.GENDER, COUNT(1)
+	FROM posts_likes pl
+	INNER JOIN users u ON (
+		 pl.user_id = u.id
+	)
+	INNER JOIN profiles p ON (
+	p.user_id = u.id
+	)
+	GROUP BY p.GENDER; 
+
+
+
+/*Найти 10 пользователей, которые проявляют наименьшую активность в использовании социальной сети.*/
+
+SELECT * 
+FROM users (
+SELECT CONCAT(first_name, ' ', last_name) AS username,
+ COUNT(DISTINCT messages.id) +
+ COUNT(DISTINCT likes.id) +
+ COUNT(DISTINCT media.id) AS activity
+ FROM users
+  LEFT JOIN messages
+   ON users.id = messages.from_user_id
+  LEFT JOIN likes  
+   ON users.id = likes.user_id
+  LEFT JOIN media 
+   ON users.id = media.user_id)
+ORDER BY messages.from_user_id, likes.user_id, media.user_id LIMIT 10;
+ 
