@@ -1,0 +1,80 @@
+CREATE TABLE `internet` (
+  `idinternet` INT NOT NULL,
+  `speed` INT(45) NOT NULL,
+  `wink` VARCHAR(45) NULL,
+  `price` INT(45) NOT NULL,
+  `name` VARCHAR(45) NULL,
+  PRIMARY KEY (`idinternet`))
+ENGINE = InnoDB;
+
+CREATE TABLE `additional_serv_cat` (
+  `id` INT NOT NULL,
+  `name` VARCHAR(45) NULL,
+  `description` VARCHAR(45) NULL,
+  PRIMARY KEY (`id`))
+ENGINE = InnoDB;
+
+CREATE TABLE `additional_service` (
+  `idadditional_service` INT NOT NULL,
+  `name` VARCHAR(45) NULL,
+  `description` VARCHAR(45) NULL,
+  `cost` INT(45) NOT NULL,
+  `additional_service_category_idadditional_service_category` INT NOT NULL,
+  `device_id` INT(45) NOT NULL,
+  `device_category_id` VARCHAR(45) NULL,
+  PRIMARY KEY (`idadditional_service`, `additional_service_category_idadditional_service_category`),
+ENGINE = InnoDB;
+
+CREATE TABLE `internet_add_serv` (
+  `internet_idinternet` INT NOT NULL,
+  `additional_serv_id` INT NOT NULL,
+  `additional_ser_category_id` INT NOT NULL,
+  PRIMARY KEY (`internet_idinternet`, `additional_serv_id`, `additional_ser_category_id`),
+ENGINE = InnoDB;
+
+CREATE TABLE `mobile` (
+  `idmobile` INT NOT NULL,
+  `name` VARCHAR(45) NULL,
+  `price` INT(45) NOT NULL,
+  `traffic_limit` INT(45) NOT NULL,
+  `sms_limit` INT(45) NOT NULL,
+  `call_limit` INT(45) NOT NULL,
+  `wink` VARCHAR(45) NULL,
+  PRIMARY KEY (`idmobile`))
+ENGINE = InnoDB;
+
+CREATE TABLE `tv` (
+  `idtv` INT NOT NULL,
+  PRIMARY KEY (`idtv`))
+ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS `package` (
+  `idpackage` INT NOT NULL,
+  `name` VARCHAR(45) NULL,
+  `internet_id` INT NOT NULL,
+  `mobile_id` INT NOT NULL,
+  `tv_idtv` INT NOT NULL,
+  PRIMARY KEY (`idpackage`, `internet_id`, `mobile_id`, `tv_idtv`),
+ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS `mobile_add_serv` (
+  `mobile_id` INT NOT NULL,
+  `additional_serv_id` INT NOT NULL,
+  `additional_serv_category_id` INT NOT NULL,
+  PRIMARY KEY (`mobile_id`, `additional_serv_id`, `additional_serv_category_id`),
+ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS `surveilance_camera` (
+  `idsurveilance_camera` INT NOT NULL,
+  PRIMARY KEY (`idsurveilance_camera`))
+ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS `smart_device` (
+  `idsmart_speaker` INT NOT NULL,
+  PRIMARY KEY (`idsmart_speaker`))
+ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS `network_device` (
+  `idnetwork_devices` INT NOT NULL,
+  PRIMARY KEY (`idnetwork_devices`))
+ENGINE = InnoDB;
